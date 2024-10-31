@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Alarm Data</title>
+    <link rel="stylesheet" href="{{ url_for('static', path='/css/styles.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/styles/github.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/highlight.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.8/clipboard.min.js"></script>
+    <style>
+        /* 内联样式，以防 CSS 文件未正确加载 */
+        .card-controls {
+            display: flex;
+            justify-content: center;
+            gap: 0.5rem;
+            padding: 0.5rem;
+            background-color: #f8f8f8;
+        }
+
+        .toggle-btn,
+        .copy-btn {
+            padding: 0.5rem 1rem;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        .card-content {
+            display: none;
+        }
+    </style>
+</head>
+
+<body>
+    <header>
+        <h1>Alarm Data</h1>
+    </header>
+    <main class="card-container">
+        {% if alarm_entries %}
+        {% for entry in alarm_entries %}
+        <div class="card">
+            <div class="card-header">
+                <h2>{{ entry.header }}</h2>
+            </div>
+            <div class="card-controls">
+                <button class="toggle-btn" onclick="toggleCard(this)">展开</button>
+                <button class="copy-btn" data-clipboard-target="#json-{{ loop.index }}">复制</button>
+            </div>
+            <div class="card-content">
+                <pre><code class="language-json" id="json-{{ loop.index }}">{{ entry.json_content }}</code></pre>
+            </div>
+        </div>
+        {% endfor %}
+        {% else %}
+        <p>No alarm entries found.</p>
+        {% endif %}
+    </main>
+
+    <script>
+        hljs.highlightAll();
+
+        new ClipboardJS('.copy-btn');
+
+        function toggleCard(button) {
+            const card = button.closest('.card');
+            const content = card.querySelector('.card-content');
+            if (content.style.display === 'none' || content.style.display === '') {
+                content.style.display = 'block';
+                button.textContent = '折叠';
+            } else {
+                content.style.display = 'none';
+                button.textContent = '展开';
+            }
+        }
+
+        // 初始化所有卡片的状态
+        document.addEventListener('DOMContentLoaded', function () {
+            const cards = document.querySelectorAll('.card');
+            cards.forEach(card => {
+                const content = card.querySelector('.card-content');
+                const button = card.querySelector('.toggle-btn');
+                content.style.display = 'none';
+                button.textContent = '展开';
+            });
+            console.log('Cards initialized:', cards.length);  // 调试信息
+        });
+    </script>
+</body>
+
+</html>
